@@ -49,6 +49,12 @@ class MagicFormula():
             return None
 
         if not self.valid_information_dict():
+            self.logger.info(self.symbol + " Ignored (info not found) !")
+            return None
+
+        if not len(self.all_modules[
+                    'incomeStatementHistory']['incomeStatementHistory']):
+            self.logger.info(self.symbol + " Ignored (Ebit of this stock is not available)")
             return None
 
         self.financial_data = self.ticker.financial_data[self.symbol]
@@ -75,20 +81,24 @@ class MagicFormula():
         :rtype: Tuple[bool, namedtuple]
         """
         if not self.valid_information_dict():
+            self.logger.info(self.symbol + " Ignored (info not found) !")
             return False
 
         self.get_recomendation_trend()
 
         if not self.valid_industry():
+            self.logger.info(self.symbol + " Ignored because of Industry type ('Insurance—Diversified' or 'Banks—Regional') !")
             return False
 
         if not self.valid_ebit():
+            self.logger.info(self.symbol + " Ignored (Min Ebit) !")
             return False
 
         self.fill_key_statistics()
         self.fill_balance_sheet()
         self.fill_ticker_info()
         if not self.valid_ticker_info():
+            self.logger.info(self.symbol + " Ignored (ticket info invalid) !")
             return False
 
         self.fill_total_cash()
@@ -123,6 +133,7 @@ class MagicFormula():
 
     def fill_ebit(self) -> None:
         """Fill the variable ebit with information from the dict all_modules"""
+
         self.ebit = \
             self.all_modules[
                 'incomeStatementHistory']['incomeStatementHistory'][0]['ebit']
